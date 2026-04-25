@@ -1,77 +1,119 @@
-# LeadProof MVP
+# ConversionLint
 
-LeadProof is a production-ready MVP for auditing local service business websites and generating lead-generation scorecards plus outreach copy.
+ConversionLint is an open-source conversion quality scanner for websites that are supposed to convert.
 
-## Stack
-- Next.js App Router + TypeScript
-- Tailwind CSS + lightweight shadcn-style UI components
-- Supabase for saved audits
-- OpenAI API for generated analysis
-- Vercel-ready setup
+Most websites are tested for speed, accessibility, and SEO. Almost none are tested for persuasion, trust, and lead flow.
 
-## Features
-- Landing page
-- Dashboard
-- New Audit flow
-- Audit Results page
-- Saved Audits page
-- Scores (1–10): first impression, mobile conversion, CTA clarity, trust signals, SEO/local relevance, lead capture, revenue potential
-- Generated outputs:
-  - Plain-English summary
-  - Top 5 issues
-  - Top 5 fixes
-  - Cold email
-  - Cold SMS
-  - Website rebuild pitch
-- Supabase persistence with graceful fallback when keys are missing
-- Mock analysis when OpenAI key is missing
+ConversionLint scans a page for conversion-critical issues like missing CTAs, weak metadata, broken phone links, missing trust sections, poor local SEO structure, incomplete schema, buried contact paths, and conversion regressions.
 
-## Quick Start
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Copy env file:
-   ```bash
-   cp .env.example .env.local
-   ```
-3. Run development server:
-   ```bash
-   npm run dev
-   ```
-4. Open http://localhost:3000
+## Tagline
 
-## Environment variables
-See `.env.example`.
+**Most websites are tested for performance. Almost none are tested for persuasion.**
 
-## Supabase setup
-Create table `audits` with a JSON-friendly schema. Example SQL:
+## Why this exists
 
-```sql
-create table if not exists audits (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz not null default now(),
-  businessName text not null,
-  websiteUrl text not null,
-  industry text not null,
-  city text not null,
-  notes text,
-  summary text not null,
-  topIssues text[] not null,
-  topFixes text[] not null,
-  coldEmail text not null,
-  coldSms text not null,
-  rebuildPitch text not null,
-  scores jsonb not null
-);
+ConversionLint helps teams answer one question quickly: **is this website built to convert?**
+
+It is intentionally deterministic (no paid AI APIs) and built as an extensible TypeScript rule engine.
+
+## Install
+
+```bash
+npm install -g conversionlint
 ```
 
-## Deployment (Vercel)
-- Import repo in Vercel
-- Add env vars from `.env.example`
-- Build command: `npm run build`
-- Output: default Next.js
+Or run directly:
 
-## Notes
-- If `OPENAI_API_KEY` is missing, app returns realistic seeded dummy audits.
-- If Supabase env vars are missing, app still works and saves latest result to localStorage for viewing on Results page.
+```bash
+npx conversionlint https://example.com
+```
+
+## Usage
+
+```bash
+conversionlint https://example.com
+conversionlint https://example.com --report
+conversionlint https://example.com --json
+conversionlint https://example.com --fail-under 80
+conversionlint https://example.com --output conversionlint-report.md
+conversionlint https://example.com --max-pages 5
+```
+
+## CLI options
+
+- `--report` Export markdown report (`conversionlint-report.md` default)
+- `--output <path>` Export markdown report to custom path
+- `--json` Print JSON report
+- `--fail-under <score>` Exit with non-zero status if score is below threshold
+- `--max-pages <count>` Crawl same-domain pages up to limit
+
+## Example output
+
+```text
+ConversionLint Score: 86/100
+
+Strong:
+✓ Primary CTA visible above the fold
+✓ Phone CTA detected
+✓ LocalBusiness schema found
+
+High Priority Issues:
+✕ No trust section detected near the hero
+✕ Open Graph image missing
+```
+
+## Rule categories
+
+1. Above-the-Fold Conversion (25)
+2. Lead Flow (20)
+3. Trust Signals (20)
+4. Local SEO (15)
+5. Metadata (10)
+6. Technical Basics (5)
+7. Conversion Consistency (5)
+
+## GitHub Action
+
+```yaml
+name: ConversionLint
+
+on:
+  pull_request:
+
+jobs:
+  conversionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ericjokl/conversionlint@v1
+        with:
+          url: "https://example.com"
+          fail-under: 80
+```
+
+Action inputs:
+- `url`
+- `fail-under`
+- `max-pages`
+- `output`
+
+## Roadmap
+
+- v0.2: richer multi-page crawl graph and broken-link tracing
+- v0.2: confidence scoring per rule
+- v0.2: rule presets for local services, SaaS, and e-commerce
+- v0.2: GitHub PR comment summaries (TODO)
+
+## Contributing
+
+PRs and rule proposals are welcome. Keep rules deterministic and evidence-based.
+
+## Portfolio context
+
+Built for Eric Jokl’s portfolio positioning:
+
+**Digital Builder | Full-Stack Developer | UX & Conversion Systems**
+
+## License
+
+MIT

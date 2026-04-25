@@ -1,0 +1,24 @@
+name: ConversionLint
+description: Conversion quality scanner for websites.
+author: Eric Jokl
+inputs:
+  url:
+    description: URL to scan
+    required: true
+  fail-under:
+    description: Minimum accepted score
+    required: false
+    default: '0'
+  max-pages:
+    description: Maximum same-domain pages to crawl
+    required: false
+    default: '1'
+  output:
+    description: Optional markdown report path
+    required: false
+runs:
+  using: node20
+  main: dist/action/action.js
+branding:
+  icon: check-circle
+  color: blue
