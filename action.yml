@@ -1,0 +1,27 @@
+name: 'ConversionLint'
+description: 'Conversion quality scanner for websites that are supposed to convert.'
+author: 'Eric Jokl'
+inputs:
+  url:
+    description: 'URL to scan'
+    required: true
+  fail-under:
+    description: 'Fail workflow if score is below this value'
+    required: false
+    default: '0'
+  max-pages:
+    description: 'Maximum same-domain pages to inspect'
+    required: false
+    default: '5'
+  output:
+    description: 'Markdown report output path'
+    required: false
+    default: 'conversionlint-report.md'
+outputs:
+  score:
+    description: 'ConversionLint total score'
+  report-path:
+    description: 'Path to generated markdown report'
+runs:
+  using: 'node20'
+  main: 'dist/action/action.js'
